@@ -49,7 +49,7 @@ whether it will fit your particular use case:
 Quick howto
 -----------
 
-You really need to read the `full docs <http://phoikoi.github.io/sisy>`_, but here
+You really need to read the `full docs <https://phoikoi.github.io/sisy>`_, but here
 is a super-fast crash course.
 
 .. code-block:: python
@@ -75,5 +75,5 @@ which can be really handy for standard tasks you want to always be running. Look
     various ways, including data migrations. This project also functions
     as the host project for generating the docs.
 
-You can find the full documentation for Sisy at `the Github Pages site for this repo <http://phoikoi.github.io/sisy>`_.
+You can find the full documentation for Sisy at `the Github Pages site for this repo <https://phoikoi.github.io/sisy>`_.
 
