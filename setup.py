@@ -57,6 +57,7 @@ setup(
         'django>=1.11',
         'channels',
         'croniter',
+        'arrow',
         'pytz',
     ],
 )
