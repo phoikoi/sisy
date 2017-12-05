@@ -19,6 +19,7 @@ First release in public repo, history from private repo scrubbed.
    heartbeat command...)
 
 1.0b3 (2017-12-05)
+------------------
 
 *  Fixed missing arrow dependency in setup.py (such are the tribulations of a new pypi package)
 
