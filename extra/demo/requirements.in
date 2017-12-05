@@ -6,6 +6,8 @@ croniter
 pytz
 psycopg2
 
+sisy
+
 # For docs
 Sphinx
 sphinx-rtd-theme
