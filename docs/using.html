@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using Sisy &mdash; sisy 1.0b1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="sisy 1.0b1 documentation" href="index.html"/>
+        <link rel="next" title="Data migrations" href="data_migrations.html"/>
+        <link rel="prev" title="Installation" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sisy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Sisy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-overview-of-sisy-s-architecture">Quick overview of Sisy’s architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#task-objects">Task objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#task-functions">Task functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#heartbeat-worker">Heartbeat worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#storing-user-data-in-the-task-object">Storing user data in the task object</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-and-running-tasks">Creating and running tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sisy-models-task-with-callable"><code class="docutils literal"><span class="pre">sisy.models.task_with_callable()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#helper-functions">Helper functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sisy-models-task-run-iterations"><code class="docutils literal"><span class="pre">sisy.models.Task.run_iterations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sisy-models-task-run-once"><code class="docutils literal"><span class="pre">sisy.models.Task.run_once()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#what-can-be-a-task-function">What can be a task function?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execution-options">Execution options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repeating-tasks">Repeating tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-formats">Common formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#field-specific-formats">Field-specific formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#combining-the-formats">Combining the formats</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#start-and-end-dates">Start and end dates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specified-iteration-counts">Specified iteration counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#one-shot-task-runs">One-shot task runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scheduling-a-one-shot-run-for-some-future-time">Scheduling a one-shot run for some future time</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_migrations.html">Data migrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sisy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Using Sisy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/using.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-sisy">
+<span id="id1"></span><h1>Using Sisy<a class="headerlink" href="#using-sisy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="quick-overview-of-sisy-s-architecture">
+<h2>Quick overview of Sisy’s architecture<a class="headerlink" href="#quick-overview-of-sisy-s-architecture" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="task-objects">
+<h3>Task objects<a class="headerlink" href="#task-objects" title="Permalink to this headline">¶</a></h3>
+<p>The heart of Sisy is the <a class="reference internal" href="reference.html#sisy.models.Task" title="sisy.models.Task"><code class="xref py py-class docutils literal"><span class="pre">sisy.models.Task</span></code></a> model class, whose instances
+embody and keep track of the tasks that Sisy will (attempt to) run on your behalf.
+The class allows a variety of different ways to schedule task execution, using its
+various fields.</p>
+</div>
+<div class="section" id="task-functions">
+<h3>Task functions<a class="headerlink" href="#task-functions" title="Permalink to this headline">¶</a></h3>
+<p>Each task ultimately runs a function that you provide, which takes one argument.
+This argument, which must be named <code class="docutils literal"><span class="pre">message</span></code>, receives a <code class="docutils literal"><span class="pre">dict</span></code> object with
+two keys: <code class="docutils literal"><span class="pre">task</span></code>, and <code class="docutils literal"><span class="pre">message</span></code>.  The value of the <code class="docutils literal"><span class="pre">task</span></code> key is the
+<code class="xref py py-class docutils literal"><span class="pre">Task</span></code> object administrating the current task run, and the <code class="docutils literal"><span class="pre">message</span></code>
+object is the message dictionary received by the Channels consumer function on the
+current worker, which kicked off the execution of the task run.</p>
+</div>
+<div class="section" id="heartbeat-worker">
+<h3>Heartbeat worker<a class="headerlink" href="#heartbeat-worker" title="Permalink to this headline">¶</a></h3>
+<p>The sisy package has a long-lived management command named <code class="docutils literal"><span class="pre">sisy_heartbeat</span></code>, which
+provides the periodic “heartbeat” messages that allow Sisy to do its job.  This management
+command does not daemonize itself; therefore it can easily be run as a <a class="reference external" href="http://supervisord.org/">supervisor</a>
+program or a <a class="reference external" href="https://github.com/nickstenning/honcho">honcho</a> process.  The author usually
+runs the heartbeat command on the same physical hardware as the <code class="docutils literal"><span class="pre">daphne</span></code> interface server,
+since the heartbeat command takes very little resources and may be considered as
+application-wide infrastructure, like the interface server.  There only needs to be one
+heartbeat worker across the entire application.</p>
+</div>
+<div class="section" id="storing-user-data-in-the-task-object">
+<h3>Storing user data in the task object<a class="headerlink" href="#storing-user-data-in-the-task-object" title="Permalink to this headline">¶</a></h3>
+<p><code class="xref py py-class docutils literal"><span class="pre">Task</span></code> objects have a property named <code class="docutils literal"><span class="pre">userdata</span></code>, which is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>
+object of JSON-serializable data.  Sisy does not do anything with this object; it is
+there for the user to store application data.  The data is automatically encoded and
+decoded to and from the <code class="xref py py-class docutils literal"><span class="pre">Task</span></code> object’s <code class="docutils literal"><span class="pre">_extra_data</span></code> field, and so is
+available to task functions when they run, both for reading and writing.  It is best
+to limit the size of data stored in this field, as the JSON is encoded/decoded on
+each access, and so there might be a significant performance and/or memory penalty
+incurred if the data is too large.</p>
+</div>
+</div>
+<div class="section" id="creating-and-running-tasks">
+<h2>Creating and running tasks<a class="headerlink" href="#creating-and-running-tasks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sisy-models-task-with-callable">
+<h3><a class="reference internal" href="reference.html#sisy.models.task_with_callable" title="sisy.models.task_with_callable"><code class="xref py py-func docutils literal"><span class="pre">sisy.models.task_with_callable()</span></code></a><a class="headerlink" href="#sisy-models-task-with-callable" title="Permalink to this headline">¶</a></h3>
+<p>This helper function is the standard way of creating a task, since creating the
+detailed information that the Task object needs (from scratch, via the constructor
+method) can be tedious.</p>
+<p>The basic form of creating and running a Sisy <code class="xref py py-class docutils literal"><span class="pre">Task</span></code> is the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span>
+
+<span class="k">def</span> <span class="nf">my_task_function</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="n">do_something_here</span><span class="p">()</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span><span class="n">my_task_function</span><span class="p">)</span>
+
+<span class="c1"># Run the task every five seconds, but only during the hours</span>
+<span class="c1"># of midnight, 3am, 6am, and 9am.</span>
+<span class="n">task</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="s1">&#39;*/5 0,3,6,9 * * *&#39;</span>
+<span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This is only the most basic form, but is the recommended method.  The
+<a class="reference internal" href="reference.html#sisy.models.task_with_callable" title="sisy.models.task_with_callable"><code class="xref py py-func docutils literal"><span class="pre">sisy.models.task_with_callable()</span></code></a> method is the most convenient way to start
+a task that has already been directly linked to a function. But you can
+also specify the various parameters directly in the constructor.</p>
+<p>The callable object that is passed to <a class="reference internal" href="reference.html#sisy.models.task_with_callable" title="sisy.models.task_with_callable"><code class="xref py py-func docutils literal"><span class="pre">sisy.models.task_with_callable()</span></code></a> can be specified as
+an actual callable object, or as a string representing the full dotted Python path
+to the callable object.</p>
+<p>The callable object <em>must</em> take only one parameter, which must be named <code class="docutils literal"><span class="pre">message</span></code>.
+This parameter will receive a dictionary containing two keys: <code class="docutils literal"><span class="pre">task</span></code>, and <code class="docutils literal"><span class="pre">message</span></code>,
+whose values are (respectively) the <code class="xref py py-class docutils literal"><span class="pre">Task</span></code> object for this task, and the Channels message dictionary
+that was received by the consumer function on the worker process.</p>
+</div>
+<div class="section" id="helper-functions">
+<h3>Helper functions<a class="headerlink" href="#helper-functions" title="Permalink to this headline">¶</a></h3>
+<p>There are also a few helper functions in the <a class="reference internal" href="reference.html#module-sisy.models" title="sisy.models"><code class="xref py py-mod docutils literal"><span class="pre">sisy.models</span></code></a> module that
+make common scenarios easier to use.</p>
+<div class="section" id="sisy-models-task-run-iterations">
+<h4><a class="reference internal" href="reference.html#sisy.models.Task.run_iterations" title="sisy.models.Task.run_iterations"><code class="xref py py-meth docutils literal"><span class="pre">sisy.models.Task.run_iterations()</span></code></a><a class="headerlink" href="#sisy-models-task-run-iterations" title="Permalink to this headline">¶</a></h4>
+<p>This helper class function allows the developer to specify that the task should run
+a given number of times, and then be deleted.</p>
+</div>
+<div class="section" id="sisy-models-task-run-once">
+<h4><a class="reference internal" href="reference.html#sisy.models.Task.run_once" title="sisy.models.Task.run_once"><code class="xref py py-meth docutils literal"><span class="pre">sisy.models.Task.run_once()</span></code></a><a class="headerlink" href="#sisy-models-task-run-once" title="Permalink to this headline">¶</a></h4>
+<p>This helper class function allows the developer to specify that the task should run
+once, immediately, and then be deleted.</p>
+</div>
+</div>
+</div>
+<div class="section" id="what-can-be-a-task-function">
+<h2>What can be a task function?<a class="headerlink" href="#what-can-be-a-task-function" title="Permalink to this headline">¶</a></h2>
+<p>There are several types of callables that are supported by Sisy:</p>
+<ul class="simple">
+<li>bare functions</li>
+<li>class methods</li>
+<li>static methods</li>
+<li>instance methods</li>
+</ul>
+<p>The first three types are fairly simple; just pass the object or the dotted-path
+string to <code class="xref py py-func docutils literal"><span class="pre">task_with_callable()</span></code>, and the task will be created. The
+<code class="xref py py-class docutils literal"><span class="pre">Task</span></code> object is passed back to you, so that you can adjust its settings
+if desired.  You need to <code class="xref py py-meth docutils literal"><span class="pre">save()</span></code> the object before it will become active.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span>
+
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">DoSomethingClassy</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span><span class="n">Foo</span><span class="o">.</span><span class="n">DoSomethingClassy</span><span class="p">)</span>
+<span class="c1"># Set it to run during business hours on weekdays, once an hour on the hour</span>
+<span class="n">task</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="s1">&#39;0 9-17 * * mon-fri&#39;</span>
+<span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Instance methods, however, are somewhat more complicated because of the
+fact that they can only be called when they are bound to a specific
+instance.  Because Sisy’s tasks can be run on any worker process (potentially on
+completely different hardware and even a different platform,) we cannot know what
+the internal state of an object instance is, in order to run it on that remote worker.
+The only case where this state can be reliably available to us is with our Django model objects,
+and so those objects are the only ones on which Sisy supports calling instance methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="c1"># Import our creation function</span>
+<span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span>
+
+<span class="k">class</span> <span class="nc">ModelFoo</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A very silly example model class&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">127</span><span class="p">)</span>
+    <span class="n">latest_run</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">doSomething</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do something very noddy, just for an example&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latest_run</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_task_for_a_ModelFoo</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Create a Sisy task for the first ModelFoo we can grab&quot;&quot;&quot;</span>
+
+    <span class="c1"># Grab the first ModelFoo in the list</span>
+    <span class="n">a_foo</span> <span class="o">=</span> <span class="n">ModelFoo</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Make a task with that ModelFoo&#39;s doSomething instance method</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span><span class="n">a_foo</span><span class="o">.</span><span class="n">doSomething</span><span class="p">)</span>
+
+    <span class="c1"># Set it to run every five minutes</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="s1">&#39;*/5 * * * *&#39;</span>
+
+    <span class="c1"># Save the task to activate it</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The preceding (silly) example will create a task that runs every five minutes, calling
+the <code class="docutils literal"><span class="pre">doSomething</span></code> method on the <code class="docutils literal"><span class="pre">ModelFoo</span></code> object that was retrieved in the
+<code class="docutils literal"><span class="pre">create_task_for_a_ModelFoo</span></code> function.</p>
+</div>
+<div class="section" id="execution-options">
+<h2>Execution options<a class="headerlink" href="#execution-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="repeating-tasks">
+<span id="id2"></span><h3>Repeating tasks<a class="headerlink" href="#repeating-tasks" title="Permalink to this headline">¶</a></h3>
+<p>The original intent of Sisy (evidenced by the choice of name, referencing
+the tragic figure of <a class="reference external" href="https://en.wikipedia.org/wiki/Sisyphus">Sisyphus</a>)
+was to make it easy to run repeating tasks in background workers, much like
+the classic Unix*cron* utility.  In fact, Sisy uses the same basic syntax as <em>cron</em>:</p>
+<p>The schedule string is divided into five (or, optionally, six) fields
+denoting different spans of time:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="18%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>field</td>
+<td>time period</td>
+<td>Ranges</td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td>minutes</td>
+<td>*, 0-59, */x, x-y, x,y,z…</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>hours</td>
+<td>*, 0-23, */x, x-y, x,y,z…</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>day of month</td>
+<td>*, 0-31, */x, x-y, “l” (for Last), x,y,z…</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>month</td>
+<td>*, 1-12, */x, x-y, x,y,z…</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>day of week</td>
+<td>*, 0-7 (both 0 and 7 are Sunday), “mon” - “sun”</td>
+</tr>
+<tr class="row-odd"><td>6*</td>
+<td>seconds</td>
+<td>*, 0-59, */x, x-y, x,y,z…</td>
+</tr>
+</tbody>
+</table>
+<p><em>*Field 6 is an extension, not supported by basic cron.</em></p>
+<p>Each field supports various forms of specification; some are common to all
+of the fields, but some are field-specific.</p>
+<div class="section" id="common-formats">
+<h4>Common formats<a class="headerlink" href="#common-formats" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>*</dt>
+<dd>Denotes “all” or “every”.  Will allow the task to run at any value of the field.</dd>
+<dt>*/x</dt>
+<dd>Denotes “every <em>x</em>”, such as <code class="docutils literal"><span class="pre">*/5</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span></code> for “every 5 minutes.”</dd>
+<dt>x-y</dt>
+<dd>Denotes a span of values (e.g. “0-7” or “mon-fri”.)</dd>
+<dt>x,y</dt>
+<dd>Denotes a series of values (e.g. <code class="docutils literal"><span class="pre">0,5,20,25</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span></code>)</dd>
+<dt>x<sub>1</sub>-y<sub>1</sub>,x<sub>2</sub>-y<sub>2</sub></dt>
+<dd>Denotes a combination of the above specs; a series of spans of values (e.g. <code class="docutils literal"><span class="pre">0-10,20-30</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span></code>)</dd>
+</dl>
+</div>
+<div class="section" id="field-specific-formats">
+<h4>Field-specific formats<a class="headerlink" href="#field-specific-formats" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>Day of month (field 3)</dt>
+<dd>Supports the use of “l” (lowercase L) to denote the “l”ast day of the month</dd>
+<dt>Day of week (field 5)</dt>
+<dd>If a numeric spec is used, both <code class="docutils literal"><span class="pre">0</span></code> and <code class="docutils literal"><span class="pre">7</span></code> may be used to denote Sunday. Also,
+the abbreviated (English) text names of the days may be used: <code class="docutils literal"><span class="pre">mon</span></code>, <code class="docutils literal"><span class="pre">tue</span></code>,
+<code class="docutils literal"><span class="pre">wed</span></code>, <code class="docutils literal"><span class="pre">thu</span></code>, <code class="docutils literal"><span class="pre">fri</span></code>, <code class="docutils literal"><span class="pre">sat</span></code>, <code class="docutils literal"><span class="pre">sun</span></code>.</dd>
+</dl>
+</div>
+<div class="section" id="combining-the-formats">
+<h4>Combining the formats<a class="headerlink" href="#combining-the-formats" title="Permalink to this headline">¶</a></h4>
+<p>The power of the format comes from combining the different fields in different
+specifications.  Some examples:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">&quot;*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*&quot;</span></code></dt>
+<dd>This is the most basic specification (and the default), which would match any time.
+By default, Sisy runs its heartbeat process once per minute, so this spec would
+run once per minute.  This matches the behavior of the Unix <em>cron</em> utility.</dd>
+<dt><code class="docutils literal"><span class="pre">&quot;30</span> <span class="pre">0</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*&quot;</span></code></dt>
+<dd>This specification would cause the task to be run at 00:30 (30 minutes
+after midnight) on every day of the month, in every month, on any day
+of the week.</dd>
+<dt><code class="docutils literal"><span class="pre">&quot;*/5</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*&quot;</span></code></dt>
+<dd>This spec would run every five minutes, on all days, at all hours. The
+<code class="docutils literal"><span class="pre">*/x</span></code> form indicates “every <em>x</em>”.</dd>
+<dt><code class="docutils literal"><span class="pre">&quot;0-10,15-20</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*&quot;</span></code></dt>
+<dd>This spec would run on minutes 0 through 10 and 15 through 20 of every
+hour of every day.</dd>
+<dt><code class="docutils literal"><span class="pre">0,15,30,45</span> <span class="pre">9-17</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">mon-fri</span></code></dt>
+<dd>This spec would run every fifteen minutes, from 9am to 5pm on Monday through Friday.</dd>
+</dl>
+<p>For further reference on the format, see
+the documentation for <a class="reference external" href="https://pypi.python.org/pypi/croniter">croniter</a>,
+the Python package which Sisy relies on to process it, or search Google for
+something like <em>“crontab format”</em>.</p>
+</div>
+</div>
+<div class="section" id="start-and-end-dates">
+<span id="id3"></span><h3>Start and end dates<a class="headerlink" href="#start-and-end-dates" title="Permalink to this headline">¶</a></h3>
+<p>Start and end dates can be specified for a task, and the task runner will
+pay attention to these, not running any task whose start and end dates are
+after or before the current time respectively.  If a task completes a run
+and its next run would be scheduled after the specified end date, the
+task will be submitted for deletion.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.utils.timezone</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">get_current_timezone</span>
+<span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span>
+<span class="kn">from</span> <span class="nn">myapp.utils</span> <span class="kn">import</span> <span class="n">limited_time_offer_function</span>
+
+<span class="n">TZ</span> <span class="o">=</span> <span class="n">get_current_timezone</span><span class="p">()</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span>
+    <span class="n">limited_time_offer_function</span><span class="p">,</span>
+    <span class="n">schedule</span><span class="o">=</span><span class="s1">&#39;0 7-19 * * *&#39;</span><span class="p">,</span> <span class="c1"># only run 7am - 7pm</span>
+    <span class="n">start_running</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">TZ</span><span class="p">),</span> <span class="c1"># first run would be New Year&#39;s Day, 0:00 local time</span>
+    <span class="n">end_running</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">TZ</span><span class="p">),</span> <span class="c1"># last run would be 7pm local time on Feb. 13th</span>
+<span class="p">)</span>
+<span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="specified-iteration-counts">
+<span id="id4"></span><h3>Specified iteration counts<a class="headerlink" href="#specified-iteration-counts" title="Permalink to this headline">¶</a></h3>
+<p>Tasks can also be specified with an iteration count, in order to limit the
+number of times the task will be run.  The task still runs according to the
+<code class="docutils literal"><span class="pre">schedule</span></code> attribute of the task object, but will be deleted after the
+specified number of runs (whether successful or not.)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the case of an ambiguity between the iteration count and the end date,
+the end date will take priority, and the task will be deleted if that
+end date will occur before the task’s next scheduled run, even if the
+iteration count is still above zero.</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">Task</span>
+<span class="kn">from</span> <span class="nn">myapp.utils</span> <span class="kn">import</span> <span class="n">first_ten_customers_function</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">run_iterations</span><span class="p">(</span>
+    <span class="n">first_ten_customers_function</span><span class="p">,</span>
+    <span class="n">schedule</span><span class="o">=</span><span class="s1">&#39;0 7-19 * * *&#39;</span><span class="p">,</span> <span class="c1"># only run 7am - 7pm</span>
+    <span class="n">iterations</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="one-shot-task-runs">
+<span id="id5"></span><h3>One-shot task runs<a class="headerlink" href="#one-shot-task-runs" title="Permalink to this headline">¶</a></h3>
+<p>As a special case of <a class="reference internal" href="#specified-iteration-counts"><span class="std std-ref">specified iteration counts</span></a>,
+Sisy can be called in a one-shot mode by using the <a class="reference internal" href="reference.html#sisy.models.Task.run_once" title="sisy.models.Task.run_once"><code class="xref py py-meth docutils literal"><span class="pre">sisy.models.Task.run_once()</span></code></a>
+function.  This takes a function and an optional JSON-serializable dictionary of user data,
+and submits it to the worker channel once, immediately, bypassing the <code class="docutils literal"><span class="pre">schedule</span></code>
+parameter of the task object, and deleting the task object immediately afterwards.
+This can be quite handy for odd jobs.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">Task</span>
+<span class="kn">from</span> <span class="nn">myapp.utils</span> <span class="kn">import</span> <span class="n">one_time_only_function</span>
+
+<span class="n">Task</span><span class="o">.</span><span class="n">run_once</span><span class="p">(</span><span class="n">one_time_only_function</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For even lazier developers, you don’t even have to import the function; just use
+the dotted path.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">Task</span>
+<span class="n">Task</span><span class="o">.</span><span class="n">run_once</span><span class="p">(</span><span class="s1">&#39;myapp.utils.one_time_only_function&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="scheduling-a-one-shot-run-for-some-future-time">
+<h3>Scheduling a one-shot run for some future time<a class="headerlink" href="#scheduling-a-one-shot-run-for-some-future-time" title="Permalink to this headline">¶</a></h3>
+<p>Because a task will not be considered runnable until its <code class="docutils literal"><span class="pre">start_running</span></code> date
+has passed, a one-shot run can be scheduled for a future time by providing a
+future datetime object to the optional <code class="docutils literal"><span class="pre">delay_until</span></code> parameter on the
+<code class="xref py py-meth docutils literal"><span class="pre">Task.run_once()</span></code> class method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">Task</span>
+<span class="kn">from</span> <span class="nn">django.utils.timezone</span> <span class="kn">import</span> <span class="n">now</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="k">def</span> <span class="nf">do_this_later</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Finally!&quot;</span><span class="p">)</span>
+
+<span class="n">three_days_from_now</span> <span class="o">=</span> <span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Task</span><span class="o">.</span><span class="n">run_once</span><span class="p">(</span><span class="n">do_this_later</span><span class="p">,</span> <span class="n">delay_until</span><span class="o">=</span><span class="n">three_days_from_now</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">delay_until</span></code> parameter is also available on the <code class="xref py py-meth docutils literal"><span class="pre">Task.run_iterations()</span></code>
+method, since the <code class="xref py py-meth docutils literal"><span class="pre">Task.run_once()</span></code> method is just a shortcut to that method.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Please note that the <code class="docutils literal"><span class="pre">delay_until</span></code> parameter <em>must</em> be an “aware” datetime; that is,
+it must include timezone information.  <code class="docutils literal"><span class="pre">django.utils.timezone.now</span></code> is a good source
+of such a datetime (as in the above sample code), or one may be constructed by providing
+a timezone (such as one obtained from <code class="docutils literal"><span class="pre">django.utils.timezone.get_current_timezone()</span></code>) in the
+<code class="docutils literal"><span class="pre">tz</span></code> parameter to the constructor of <code class="docutils literal"><span class="pre">datetime.datetime</span></code>.  See snippet below for an example.</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">Task</span>
+
+<span class="n">OUR_TIMEZONE</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">get_current_timezone</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">do_this_later</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;This should happen much later...&quot;</span><span class="p">)</span>
+
+<span class="n">later</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">OUR_TIMEZONE</span><span class="p">)</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">Task</span><span class="o">.</span><span class="n">run_once</span><span class="p">(</span><span class="n">do_this_later</span><span class="p">,</span> <span class="n">delay_until</span><span class="o">=</span><span class="n">later</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data_migrations.html" class="btn btn-neutral float-right" title="Data migrations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Peter Hull.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0b1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

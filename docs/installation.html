@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; sisy 1.0b1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="sisy 1.0b1 documentation" href="index.html"/>
+        <link rel="next" title="Using Sisy" href="using.html"/>
+        <link rel="prev" title="sisy" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sisy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-settings">Project settings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using Sisy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_migrations.html">Data migrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sisy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>In order to use Sisy, you must first <a class="reference external" href="http://channels.readthedocs.io/en/latest/installation.html">install Channels</a>. Once you have it up and running,
+proceed with the steps below. If you haven’t used Channels before, you may want to
+look through some of the Channels docs, including <a class="reference external" href="http://channels.readthedocs.io/en/latest/concepts.html">Channels Concepts</a> and the <a class="reference external" href="http://channels.readthedocs.io/en/latest/getting-started.html">Getting Started guide</a>.</p>
+<ul>
+<li><p class="first">Install Sisy from PyPI: <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">sisy</span></code></p>
+</li>
+<li><p class="first">Add Sisy to your <a class="reference external" href="http://django.readthedocs.io/en/latest/ref/settings.html#std:setting-INSTALLED_APPS" title="(in Django v2.1)"><code class="xref std std-setting docutils literal"><span class="pre">INSTALLED_APPS</span></code></a> list:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+<span class="hll">    <span class="s1">&#39;channels&#39;</span><span class="p">,</span>
+</span><span class="hll">    <span class="s1">&#39;sisy.apps.SisyConfig&#39;</span><span class="p">,</span>
+</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Add Sisy’s routing to your <code class="docutils literal"><span class="pre">routing.py</span></code> file:</p>
+<blockquote>
+<div><div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">channels.routing</span> <span class="kn">import</span> <span class="n">route</span><span class="p">,</span> <span class="n">include</span>
+
+<span class="n">channel_routing</span> <span class="o">=</span> <span class="p">[</span>
+<span class="hll">    <span class="n">include</span><span class="p">(</span><span class="s1">&#39;sisy.routing.channel_routing&#39;</span><span class="p">),</span>
+</span><span class="c1">#    route(&quot;websocket.connect&quot;, ws_add),</span>
+<span class="c1">#    route(&quot;websocket.receive&quot;, ws_message),</span>
+<span class="c1">#    route(&quot;websocket.disconnect&quot;, ws_disconnect),</span>
+<span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</li>
+<li><p class="first">Make sure there is at least one worker running which listens to the channels
+that Sisy sends its messages on (see <a class="reference internal" href="#project-settings">Project Settings</a> below).</p>
+</li>
+<li><p class="first">Start the <code class="docutils literal"><span class="pre">sisy_heartbeat</span></code> management command to provide the heartbeat messages
+to Sisy.  This can be easily run alongside <code class="docutils literal"><span class="pre">daphne</span></code> as it uses very little in
+terms of CPU load.</p>
+</li>
+<li><p class="first">Now you can <a class="reference internal" href="using.html#using-sisy"><span class="std std-ref">start using Sisy</span></a>.</p>
+</li>
+</ul>
+<div class="section" id="project-settings">
+<h2>Project settings<a class="headerlink" href="#project-settings" title="Permalink to this headline">¶</a></h2>
+<p>All of these settings are optional. If you already have an existing
+django/channels project, you probably already have a channel name
+scheme.  You can adjust Sisy’s names to fit your pattern with these
+settings, if necessary.  You can also adjust the frequency of the
+“clock tick” messages that Sisy sends to its scheduling code.</p>
+<p><code class="xref std std-setting docutils literal"><span class="pre">SISY_HEARTBEAT_CHANNEL</span></code> (default: <code class="docutils literal"><span class="pre">sisy.heartbeat</span></code>)</p>
+<blockquote>
+<div><em>(string)</em> Provides the channel name for Sisy to use for the heartbeat messages.</div></blockquote>
+<p><code class="xref std std-setting docutils literal"><span class="pre">SISY_RUN_TASK_CHANNEL</span></code> (default: <code class="docutils literal"><span class="pre">sisy.run_task</span></code>)</p>
+<blockquote>
+<div><em>(string)</em> Provides the channel name for Sisy to run the tasks on a worker.</div></blockquote>
+<p><code class="xref std std-setting docutils literal"><span class="pre">SISY_KILL_TASK_CHANNEL</span></code> (default: <code class="docutils literal"><span class="pre">sisy.kill_task</span></code>)</p>
+<blockquote>
+<div><em>(string)</em> Provides the channel name for Sisy to run the task reaper (to kill completed tasks.)</div></blockquote>
+<p><code class="xref std std-setting docutils literal"><span class="pre">SISY_HEARTBEAT_FREQUENCY</span></code> (default: <code class="docutils literal"><span class="pre">60</span></code>)</p>
+<blockquote>
+<div><em>(integer)</em> Determines the frequency (in seconds) of Sisy’s heartbeat messages.  This sets the
+bound on task frequency; no task can execute more frequently than this setting. Consequently, if you need
+more frequent task runs, set this lower (probably not lower than about 5, as Sisy is not designed
+to handle very high frequency tasks) and add the optional sixth field to your frequently-called task’s schedule,
+to specify the seconds; e.g. <code class="docutils literal"><span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*/30</span></code> will make the task eligible for execution every thirty
+seconds.</div></blockquote>
+<p><code class="xref std std-setting docutils literal"><span class="pre">SISY_DEFAULT_SCHEDULE</span></code> (default: <code class="docutils literal"><span class="pre">'*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*'</span></code>)</p>
+<blockquote>
+<div><em>(string)</em> Provides the default <em>cron</em> schedule for Sisy’s tasks.  The default
+causes the task to run once per minute.</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="using.html" class="btn btn-neutral float-right" title="Using Sisy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="sisy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Peter Hull.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0b1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+web_worker: python manage.py runworker --threads=1 --only-channels=http.* --only-channels=websocket.*
+
+
+

@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data migrations &mdash; sisy 1.0b1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="sisy 1.0b1 documentation" href="index.html"/>
+        <link rel="next" title="API reference" href="reference.html"/>
+        <link rel="prev" title="Using Sisy" href="using.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sisy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using Sisy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data migrations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#instance-methods-in-data-migrations">Instance methods in data migrations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sisy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Data migrations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/data_migrations.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-migrations">
+<h1>Data migrations<a class="headerlink" href="#data-migrations" title="Permalink to this headline">¶</a></h1>
+<p>When creating applications that use Sisy to maintain various regular housekeeping
+tasks, it can be handy to have those tasks automatically created on installation,
+rather than having to manually create them in the admin interface.  This can be
+accomplished by creating a <em>data migration</em> within the application’s <code class="docutils literal"><span class="pre">migrations</span></code>
+directory.  This will be applied by the Django <code class="docutils literal"><span class="pre">migrate</span></code> command.</p>
+<p>It’s worth a read through the
+<a class="reference external" href="https://docs.djangoproject.com/en/1.11/topics/migrations/#data-migrations">Django documentation on data migrations</a>
+if you haven’t created one before.</p>
+<p>For use with Sisy tasks, the migration file could look similar to the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">migrations</span>
+<span class="kn">from</span> <span class="nn">myapp.utilities</span> <span class="kn">import</span> <span class="n">daily_maintenance</span>
+<span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span>
+
+<span class="n">TASK_NAME</span> <span class="o">=</span> <span class="s1">&#39;Daily data maintenance&#39;</span>
+
+<span class="k">def</span> <span class="nf">add_repeating</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span>
+        <span class="n">daily_maintenance</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">TASK_NAME</span><span class="p">,</span>
+        <span class="n">schedule</span><span class="o">=</span><span class="s1">&#39;30 0 * * *&#39;</span><span class="p">,</span> <span class="c1"># every day at 30 minutes past midnight</span>
+        <span class="n">userdata</span><span class="o">=</span><span class="p">{},</span> <span class="c1"># optional</span>
+    <span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">remove_repeating</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;sisy.Task&#39;</span><span class="p">)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">TASK_NAME</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;myapp&#39;</span><span class="p">,</span> <span class="s1">&#39;0001_initial&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;sisy&#39;</span><span class="p">,</span> <span class="s1">&#39;0001_initial&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">RunPython</span><span class="p">(</span><span class="n">add_repeating</span><span class="p">,</span> <span class="n">reverse_code</span><span class="o">=</span><span class="n">remove_repeating</span><span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>The dependencies will of course have to be adjusted to fit your app’s state,
+but in any case, the dependency on the latest Sisy migration file needs to
+be there.  At the time of writing, there is only one, but after the package
+is released to the public, it may change.</p>
+<div class="section" id="instance-methods-in-data-migrations">
+<h2>Instance methods in data migrations<a class="headerlink" href="#instance-methods-in-data-migrations" title="Permalink to this headline">¶</a></h2>
+<p>The example given above will work just fine with plain functions, and with class methods and static
+methods of classes that are not Django models. But when it comes to instance methods, things get sticky.
+Instance methods are only useful if you have an instance of the class to work with, and the remote
+worker process that the task will be run on has no way of getting to the object instance that the
+migration is working with.</p>
+<p>Of course, Django model classes are designed to carry their state and be “reanimated”, if you will,
+but in the case of migrations they have their own problems.  Migrations are exactly the process of
+changing the Django models in some way or other, and as a consequence, the models we can access
+during the migration process have no methods at all–not instance, class, or static methods.  So
+in a migration file, we cannot send our method callables to <code class="xref py py-func docutils literal"><span class="pre">task_with_callable()</span></code> as actual objects.
+We must use a dotted path.</p>
+<p>In the case of instance methods, there is an additional wrinkle. With class and static methods,
+the dotted path is sufficient to completely specify the identity of the function to run.  However,
+with instance methods, we also need to know which instance should be associated with the function.
+For this specific case, there is an additional argument to <code class="xref py py-func docutils literal"><span class="pre">task_with_callable()</span></code>: <code class="docutils literal"><span class="pre">pk_override</span></code>.
+This argument takes the integer PK (primary key) ID of the Django model instance that should be retrieved
+when the function will be run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">migrations</span>
+<span class="kn">from</span> <span class="nn">sisy.models</span> <span class="kn">import</span> <span class="n">task_with_callable</span><span class="p">,</span> <span class="n">taskinfo_with_label</span>
+
+<span class="n">TASK_NAME</span> <span class="o">=</span> <span class="s1">&#39;A suitably unique label for the task&#39;</span>
+<span class="n">METHOD_NAME</span> <span class="o">=</span> <span class="s1">&#39;myapp.models.ModelFoo.InstanceMethod&#39;</span>
+
+<span class="c1"># Function to run the forward migration</span>
+<span class="k">def</span> <span class="nf">add_repeating</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+    <span class="c1"># Look up our model by asking Django for it</span>
+    <span class="c1"># This is only a stand-in class, not the real thing</span>
+    <span class="n">ModelFoo</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;myapp.ModelFoo&#39;</span><span class="p">)</span>
+    <span class="c1"># Create a new instance of our class</span>
+    <span class="n">newFoo</span> <span class="o">=</span> <span class="n">ModelFoo</span><span class="p">()</span>
+    <span class="c1"># We must save the object to set its PK.</span>
+    <span class="c1"># Note: there are no custom methods at this point;</span>
+    <span class="c1"># including overridden save() methods!</span>
+    <span class="n">newFoo</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span>
+        <span class="n">newFoo</span><span class="o">.</span><span class="n">InstanceMethod</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">TASK_NAME</span><span class="p">,</span>
+        <span class="n">schedule</span><span class="o">=</span><span class="s1">&#39;* * * * *&#39;</span><span class="p">,</span>
+        <span class="n">pk_override</span><span class="o">=</span><span class="n">newFoo</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="c1"># Function to run the reverse migration</span>
+<span class="k">def</span> <span class="nf">remove_repeating</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+    <span class="c1"># Get the temporary version of sisy.Task</span>
+    <span class="n">Task</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;sisy.Task&#39;</span><span class="p">)</span>
+    <span class="c1"># Get the temporary version of our model class</span>
+    <span class="n">ModelFoo</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;myapp.ModelFoo&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Look up our task by label</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">TASK_NAME</span><span class="p">)</span>
+    <span class="c1"># Disable it so it can&#39;t have a race condition while</span>
+    <span class="c1"># we&#39;re removing it (unless it&#39;s already running, which</span>
+    <span class="c1"># is another problem entirely)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">enabled</span><span class="o">=</span><span class="bp">False</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1"># Look up our callable object&#39;s task info with a special function</span>
+    <span class="c1"># and pull the object&#39;s PK out of it</span>
+    <span class="n">oldFooPK</span> <span class="o">=</span> <span class="n">taskinfo_with_label</span><span class="p">(</span><span class="n">TASK_NAME</span><span class="p">)[</span><span class="s1">&#39;model_pk&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Retrieve the object and delete it</span>
+    <span class="c1"># This is not mandatory, but probably a good idea.</span>
+    <span class="n">oldFoo</span> <span class="o">=</span> <span class="n">ModelFoo</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">oldFooPK</span><span class="p">)</span>
+    <span class="n">oldFoo</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+    <span class="c1"># Now we can delete the task object.</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
+    <span class="c1"># You must adapt the dependencies to fit your own project&#39;s</span>
+    <span class="c1"># existing migrations. This example is from the demo project.</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;myapp&#39;</span><span class="p">,</span> <span class="s1">&#39;0004-setup-staticmethod-task&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;sisy&#39;</span><span class="p">,</span> <span class="s1">&#39;0001_initial&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">RunPython</span><span class="p">(</span><span class="n">add_repeating</span><span class="p">,</span> <span class="n">reverse_code</span><span class="o">=</span><span class="n">remove_repeating</span><span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="reference.html" class="btn btn-neutral float-right" title="API reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="using.html" class="btn btn-neutral" title="Using Sisy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Peter Hull.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0b1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

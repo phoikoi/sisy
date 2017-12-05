@@ -1,0 +1,588 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sisy.models &mdash; sisy 1.0b1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="sisy 1.0b1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> sisy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../using.html">Using Sisy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_migrations.html">Data migrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">sisy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>sisy.models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for sisy.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="k">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="k">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="k">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span> <span class="nn">channels</span> <span class="k">import</span> <span class="n">Channel</span>
+<span class="kn">from</span> <span class="nn">croniter</span> <span class="k">import</span> <span class="n">croniter</span>
+
+<span class="kn">from</span> <span class="nn">sisy</span> <span class="k">import</span> <span class="n">RUN_TASK_CHANNEL</span><span class="p">,</span> <span class="n">KILL_TASK_CHANNEL</span><span class="p">,</span> <span class="n">DEFAULT_SCHEDULE</span>
+
+<span class="n">TZ</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">TIME_ZONE</span><span class="p">)</span>
+
+<span class="n">HAS_NOT_RUN</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+<span class="n">FAR_FUTURE</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2217</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+<span class="n">fullpath</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{x.__module__}</span><span class="s2">.</span><span class="si">{x.__qualname__}</span><span class="s2">&quot;</span>
+
+<span class="k">def</span> <span class="nf">get_member</span><span class="p">(</span><span class="n">thing_obj</span><span class="p">,</span> <span class="n">member_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a member from an object by (string) name&quot;&quot;&quot;</span>
+    <span class="n">mems</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">thing_obj</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">member_string</span> <span class="ow">in</span> <span class="n">mems</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mems</span><span class="p">[</span><span class="n">member_string</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">get_module_member_by_dottedpath</span><span class="p">(</span><span class="n">dottedpath</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">dottedpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">thing_name</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_member</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">thing_name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_func_info</span><span class="p">(</span><span class="n">thing</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">thing</span><span class="p">):</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sig</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;self&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot call unbound instance method&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">thing</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="n">thing</span><span class="o">.</span><span class="vm">__qualname__</span><span class="p">:</span>
+            <span class="n">functype</span> <span class="o">=</span> <span class="s1">&#39;function&#39;</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">func_type</span><span class="o">=</span><span class="n">functype</span><span class="p">,</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                <span class="n">func_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">func_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">functype</span> <span class="o">=</span> <span class="s1">&#39;staticmethod&#39;</span>
+            <span class="n">classname</span> <span class="o">=</span> <span class="n">thing</span><span class="o">.</span><span class="vm">__qualname__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">class_dottedpath</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{thing.__module__}</span><span class="s2">.</span><span class="si">{classname}</span><span class="s2">&quot;</span>
+
+            <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">func_type</span><span class="o">=</span><span class="n">functype</span><span class="p">,</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                <span class="n">class_name</span><span class="o">=</span><span class="n">classname</span><span class="p">,</span>
+                <span class="n">class_path</span><span class="o">=</span><span class="n">class_dottedpath</span><span class="p">,</span>
+                <span class="n">func_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">func_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">info</span>
+
+    <span class="k">elif</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">thing</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">func_type</span><span class="o">=</span><span class="s1">&#39;classmethod&#39;</span><span class="p">,</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                <span class="n">class_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">class_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span><span class="p">),</span>
+                <span class="n">func_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">func_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="n">mro</span> <span class="o">=</span> <span class="p">[</span><span class="n">fullpath</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmro</span><span class="p">(</span><span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)]</span>
+        <span class="c1"># bases = [fullpath(x) for x in thing.__self__.__class__.__bases__]</span>
+        <span class="k">if</span> <span class="s1">&#39;django.db.models.base.Model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mro</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Can only call instance methods of Django model objects, not {fullpath(thing)}.&quot;</span><span class="p">)</span>
+
+        <span class="n">model_obj</span> <span class="o">=</span> <span class="n">thing</span><span class="o">.</span><span class="vm">__self__</span>
+        <span class="n">model_pk</span> <span class="o">=</span> <span class="n">model_obj</span><span class="o">.</span><span class="n">pk</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">func_type</span><span class="o">=</span><span class="s1">&#39;instancemethod&#39;</span><span class="p">,</span>
+            <span class="n">module_name</span><span class="o">=</span><span class="n">model_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+            <span class="n">class_name</span><span class="o">=</span><span class="n">model_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">class_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">model_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">),</span>
+            <span class="n">model_pk</span><span class="o">=</span><span class="n">model_pk</span><span class="p">,</span>
+            <span class="n">func_name</span><span class="o">=</span><span class="n">thing</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">func_path</span><span class="o">=</span><span class="n">fullpath</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{fullpath(thing)} is not a callable object&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">func_from_string</span><span class="p">(</span><span class="n">callable_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a live function from a full dotted path.  Must be either a plain function</span>
+<span class="sd">    directly in a module, a class function, or a static function.  (No modules, classes,</span>
+<span class="sd">    or instance methods, since those can&#39;t be called as tasks.)&quot;&quot;&quot;</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">callable_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+    <span class="n">func</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Need full dotted path to task function&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">mod_name</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">func_name</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Module </span><span class="si">{mod_name}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{func_name}</span><span class="s2"> is not a member of </span><span class="si">{mod_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mod_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">func_name</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
+            <span class="n">mod_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Module </span><span class="si">{mod_name}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+
+            <span class="n">klass</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">klass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Class </span><span class="si">{class_name}</span><span class="s2"> is not a member of </span><span class="si">{mod_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">func</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Function </span><span class="si">{func_name}</span><span class="s2"> is not a member of </span><span class="si">{mod_name}</span><span class="s2">.</span><span class="si">{class_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Function </span><span class="si">{func_name}</span><span class="s2"> is not a member of </span><span class="si">{mod_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot call module directly&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot call class directly&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{callable_str}</span><span class="s2"> ({str(type(func))[1:-1]}) is not a callable object&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sig</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;message&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Task function must have one parameter, named &#39;message&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">sig</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;self&#39;</span> <span class="ow">and</span> <span class="n">sig</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;message&#39;</span><span class="p">:</span>
+        <span class="c1"># We only check for the conventional &#39;self&#39;, but if you&#39;re using something else,</span>
+        <span class="c1"># you deserve the pain you&#39;ll have trying to debug this.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t call instance method without an instance! (Try sisy.models.task_with_callable)&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Improper signature for task function (needs only &#39;message&#39;)&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">funcinfo_from_string</span><span class="p">(</span><span class="n">callable_str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_func_info</span><span class="p">(</span><span class="n">func_from_string</span><span class="p">(</span><span class="n">callable_str</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Task"><a class="viewcode-back" href="../../reference.html#sisy.models.Task">[docs]</a><span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main object model, keeps task state between workers&quot;&quot;&quot;</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(automatic)&quot;</span><span class="p">)</span>
+    <span class="n">modified_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(automatic)&quot;</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(required) Name of task, normally the same as the callback string&quot;</span><span class="p">)</span>
+    <span class="n">schedule</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_SCHEDULE</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(required) Cron-format schedule for running the task&quot;</span><span class="p">)</span>
+    <span class="n">last_run</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">HAS_NOT_RUN</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(automatic)&quot;</span><span class="p">)</span>
+    <span class="n">next_run</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">HAS_NOT_RUN</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(automatic)&quot;</span><span class="p">)</span>
+    <span class="n">enabled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) If false, sisy will skip this task&quot;</span><span class="p">)</span>
+    <span class="n">_func_info</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(internal) Dictionary of callable function info, stored as JSON&quot;</span><span class="p">)</span>
+    <span class="n">_extra_data</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(internal) Dictionary of user data, stored as JSON.   Normally accessed only through the ``userdata`` property.&quot;</span><span class="p">)</span>
+    <span class="n">wait_for_schedule</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) Should the task wait for its first cron schedule, or run immediately&quot;</span><span class="p">)</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) Run the task this many times, then kill it&quot;</span><span class="p">)</span>
+    <span class="n">allow_overlap</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) Should sisy allow more than one instance of this task to run at once&quot;</span><span class="p">)</span>
+    <span class="n">running</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(automatic) Is a worker actually running the task at the moment&quot;</span><span class="p">)</span>
+    <span class="n">start_running</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">HAS_NOT_RUN</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) Date and time when task will start running&quot;</span><span class="p">)</span>
+    <span class="n">end_running</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">FAR_FUTURE</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(optional) Date and time when task will stop running&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;Task </span><span class="si">{self.pk}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">userdata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_data</span><span class="p">)</span>
+
+
+    <span class="nd">@userdata</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">userdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">funcinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_func_info</span><span class="p">)</span>
+
+    <span class="nd">@funcinfo</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">funcinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_func_info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">func_from_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find and return a callable object from a task info dictionary&quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">funcinfo</span>
+        <span class="n">functype</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;func_type&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">functype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;instancemethod&#39;</span><span class="p">,</span> <span class="s1">&#39;classmethod&#39;</span><span class="p">,</span> <span class="s1">&#39;staticmethod&#39;</span><span class="p">]:</span>
+            <span class="n">the_modelclass</span> <span class="o">=</span> <span class="n">get_module_member_by_dottedpath</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;class_path&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">functype</span> <span class="o">==</span> <span class="s1">&#39;instancemethod&#39;</span><span class="p">:</span>
+                <span class="n">the_modelobject</span> <span class="o">=</span> <span class="n">the_modelclass</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;model_pk&#39;</span><span class="p">])</span>
+                <span class="n">the_callable</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">the_modelobject</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;func_name&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">the_callable</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">the_modelclass</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;func_name&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">the_callable</span>
+        <span class="k">elif</span> <span class="n">functype</span> <span class="o">==</span> <span class="s1">&#39;function&#39;</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;module_name&#39;</span><span class="p">])</span>
+            <span class="n">the_callable</span> <span class="o">=</span> <span class="n">get_member</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;func_name&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">the_callable</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Unknown functype &#39;</span><span class="si">{functype}</span><span class="s2"> in task </span><span class="si">{self.pk}</span><span class="s2"> (</span><span class="si">{self.label}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_tasks</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal task-runner class method, called by :py:func:`sisy.consumers.run_heartbeat`&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">next_run</span> <span class="o">==</span> <span class="n">HAS_NOT_RUN</span><span class="p">:</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">calc_next_run</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">next_run</span> <span class="o">&lt;</span> <span class="n">now</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">start_running</span> <span class="o">&lt;</span> <span class="n">now</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">end_running</span> <span class="o">&gt;</span> <span class="n">now</span><span class="p">):</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">run_asap</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                        <span class="n">Channel</span><span class="p">(</span><span class="n">KILL_TASK_CHANNEL</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">task</span><span class="o">.</span><span class="n">pk</span><span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">calc_next_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate next run time of this task&quot;&quot;&quot;</span>
+        <span class="n">base_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_run</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_run</span> <span class="o">==</span> <span class="n">HAS_NOT_RUN</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_schedule</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_run</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_schedule</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># reset so we don&#39;t run on every clock tick</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">base_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_run</span> <span class="o">=</span> <span class="n">croniter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="p">,</span> <span class="n">base_time</span><span class="p">)</span><span class="o">.</span><span class="n">get_next</span><span class="p">(</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal instance method to submit this task for running immediately.</span>
+<span class="sd">        Does not handle any iteration, end-date, etc., processing.&quot;&quot;&quot;</span>
+        <span class="n">Channel</span><span class="p">(</span><span class="n">RUN_TASK_CHANNEL</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="s1">&#39;ts&#39;</span><span class="p">:</span> <span class="n">timestamp</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()})</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal instance method run by worker process to actually run the task callable.&quot;&quot;&quot;</span>
+        <span class="n">the_callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_from_info</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">task_message</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">channel_message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">the_callable</span><span class="p">(</span><span class="n">task_message</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_running</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_run</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="o">=</span><span class="kc">False</span>
+                <span class="n">Channel</span><span class="p">(</span><span class="n">KILL_TASK_CHANNEL</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">})</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">Channel</span><span class="p">(</span><span class="n">KILL_TASK_CHANNEL</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">})</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">run_asap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instance method to run this task immediately.&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_run</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_next_run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Task.run_iterations"><a class="viewcode-back" href="../../reference.html#sisy.models.Task.run_iterations">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_iterations</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">the_callable</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schedule</span><span class="o">=</span><span class="s1">&#39;* * * * * *&#39;</span><span class="p">,</span> <span class="n">userdata</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">run_immediately</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">delay_until</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class method to run a callable with a specified number of iterations&quot;&quot;&quot;</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">task_with_callable</span><span class="p">(</span><span class="n">the_callable</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">schedule</span><span class="o">=</span><span class="n">schedule</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="n">userdata</span><span class="p">)</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">iterations</span>
+        <span class="k">if</span> <span class="n">delay_until</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delay_until</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">delay_until</span> <span class="o">&gt;</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">start_running</span> <span class="o">=</span> <span class="n">delay_until</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Task cannot start running in the past&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;delay_until must be a datetime.datetime instance&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run_immediately</span><span class="p">:</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">next_run</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">calc_next_run</span><span class="p">()</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Task.run_once"><a class="viewcode-back" href="../../reference.html#sisy.models.Task.run_once">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">run_once</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">the_callable</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delay_until</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class method to run a one-shot task, immediately.&quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">run_iterations</span><span class="p">(</span><span class="n">the_callable</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="n">userdata</span><span class="p">,</span> <span class="n">run_immediately</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delay_until</span><span class="o">=</span><span class="n">delay_until</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="task_with_callable"><a class="viewcode-back" href="../../reference.html#sisy.models.task_with_callable">[docs]</a><span class="k">def</span> <span class="nf">task_with_callable</span><span class="p">(</span><span class="n">the_callable</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schedule</span><span class="o">=</span><span class="n">DEFAULT_SCHEDULE</span><span class="p">,</span> <span class="n">userdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pk_override</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Factory function to create a properly initialized task.&quot;&quot;&quot;</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">the_callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pk_override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="n">the_callable</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">func_type</span><span class="o">=</span><span class="s1">&#39;instancemethod&#39;</span><span class="p">,</span>
+                <span class="n">module_name</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="n">class_name</span><span class="o">=</span><span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">class_path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="n">model_pk</span><span class="o">=</span><span class="n">pk_override</span><span class="p">,</span>
+                <span class="n">func_name</span><span class="o">=</span><span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">func_path</span><span class="o">=</span><span class="n">the_callable</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">funcinfo</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">funcinfo</span> <span class="o">=</span> <span class="n">get_func_info</span><span class="p">(</span><span class="n">func_from_string</span><span class="p">(</span><span class="n">the_callable</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">funcinfo</span> <span class="o">=</span> <span class="n">get_func_info</span><span class="p">(</span><span class="n">the_callable</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">funcinfo</span><span class="p">[</span><span class="s1">&#39;func_path&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
+    <span class="n">task</span><span class="o">.</span><span class="n">schedule</span> <span class="o">=</span> <span class="n">schedule</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">croniter</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">schedule</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Cron schedule </span><span class="si">{task.schedule}</span><span class="s2"> is not valid&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">userdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">userdata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">userdata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">userdata</span> <span class="o">=</span> <span class="n">userdata</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Userdata must be a dictionary of JSON-serializable data&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">task</span></div>
+
+<span class="k">def</span> <span class="nf">taskinfo_with_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return task info dictionary from task label.  Internal function,</span>
+<span class="sd">    pretty much only used in migrations since the model methods aren&#39;t there.&quot;&quot;&quot;</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">_func_info</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">info</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Peter Hull.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0b1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

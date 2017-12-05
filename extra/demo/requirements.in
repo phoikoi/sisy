@@ -1,0 +1,17 @@
+django==2.0
+channels
+asgi-redis
+arrow
+croniter
+pytz
+psycopg2
+
+# For docs
+Sphinx
+sphinx-rtd-theme
+
+# For requirements management
+pip-tools
+
+# For running daphne and workers in separate processes
+honcho

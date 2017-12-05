@@ -1,0 +1,6 @@
+daphne: daphne -b 0.0.0.0 -p 8000 acq.asgi:channel_layer
+
+sisy_heartbeat: python manage.py sisy_heartbeat
+
+
+

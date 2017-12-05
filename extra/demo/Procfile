@@ -1,0 +1,10 @@
+daphne: daphne -b 0.0.0.0 -p 8000 demo.asgi:channel_layer
+
+sisy_heartbeat: python manage.py sisy_heartbeat
+
+sisy_worker: python manage.py runworker --threads=1 --exclude-channels=http.* --exclude-channels=websocket.*
+
+web_worker: python manage.py runworker --threads=1 --only-channels=http.* --only-channels=websocket.*
+
+
+

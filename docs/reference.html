@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API reference &mdash; sisy 1.0b1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="sisy 1.0b1 documentation" href="index.html"/>
+        <link rel="next" title="Release notes" href="release_notes.html"/>
+        <link rel="prev" title="Data migrations" href="data_migrations.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> sisy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using Sisy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_migrations.html">Data migrations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sisy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/reference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sisy.models">
+<span id="api-reference"></span><h1>API reference<a class="headerlink" href="#module-sisy.models" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="sisy.models.task_with_callable">
+<code class="descclassname">sisy.models.</code><code class="descname">task_with_callable</code><span class="sig-paren">(</span><em>the_callable</em>, <em>label=None</em>, <em>schedule=sisy.DEFAULT_SCHEDULE</em>, <em>userdata=None</em>, <em>pk_override=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sisy/models.html#task_with_callable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sisy.models.task_with_callable" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>the_callable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The function to call; can be object or string with dotted path.</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string label for the task object.  If not specified, will be set to the dotted path of the callable.</li>
+<li><strong>schedule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The <em>cron</em>-formatted string specifying the execution schedule for the task.  If not specified, will be set to the default schedule as defined in the Django setting <code class="docutils literal"><span class="pre">SISY_DEFAULT_SCHEDULE</span></code>, or, if that is not set, to ‘* * * * *’, which will execute once per minute.</li>
+<li><strong>userdata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A Python dictionary of JSON-serializable data.  If not specified, the dictionary will be empty.</li>
+<li><strong>pk_override</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – For use only when creating tasks by dotted path to Django model instance methods; provides instance primary key to enable retrieval of the model object in the remote worker.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the Task object for the specified function.  Must be saved before it will become active.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#sisy.models.Task" title="sisy.models.Task"><code class="xref py py-class docutils literal"><span class="pre">sisy.models.Task</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sisy.models.Task">
+<em class="property">class </em><code class="descclassname">sisy.models.</code><code class="descname">Task</code><a class="reference internal" href="_modules/sisy/models.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sisy.models.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Public fields</strong></p>
+<p>These fields are safe to modify directly in the task object, though it is
+usually easier to use the class methods to set them on task creation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the task, by default the same as the dotted Python path to the callable function</li>
+<li><strong>schedule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Cron-format schedule for running the task</li>
+<li><strong>enabled</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – The task will not be scheduled if this field is false</li>
+<li><strong>start_running</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Datetime when the task is first eligible to run</li>
+<li><strong>end_running</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Datetime when the task is no longer eligible to run</li>
+<li><strong>wait_for_schedule</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Should the task wait for its first scheduled run, or run immediately</li>
+<li><strong>iterations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Number of iterations to schedule the task (0 means infinite)</li>
+<li><strong>allow_overlap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If false, sisy will not start a second worker on this task while one is already running</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Internal fields</strong></p>
+<p>These fields are managed by code in the class methods; it is best to not
+modify them directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>created_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Datetime when the task was created</li>
+<li><strong>modified_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Datetime of the last modification of the task</li>
+<li><strong>last_run</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Datetime of latest task run (default is <code class="docutils literal"><span class="pre">sisy.models.HAS_NOT_RUN</span></code>)</li>
+<li><strong>next_run</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – Calculated datetime of next scheduled task run</li>
+<li><strong>_func_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Internal dictionary of details about the callable function, stored as JSON</li>
+<li><strong>_extra_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Internal dictionary of userdata, stored as JSON.  Access through the <code class="docutils literal"><span class="pre">userdata</span></code> property.</li>
+<li><strong>running</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Internal flag to keep track of whether a worker is currently running this task, to avoid overlap if that has been specified</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="sisy.models.Task.run_iterations">
+<em class="property">classmethod </em><code class="descname">run_iterations</code><span class="sig-paren">(</span><em>cls</em>, <em>the_callable</em>, <em>iterations=1</em>, <em>label=None</em>, <em>schedule='* * * * * *'</em>, <em>userdata=dict</em>, <em>run_immediately=False</em>, <em>delay_until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sisy/models.html#Task.run_iterations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sisy.models.Task.run_iterations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>the_callable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The function to call; can be object or string with dotted path.</li>
+<li><strong>iterations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The number of iterations that this task should run (according to its <em>cron</em> schedule)</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string label for the task object.  If not specified, will be set to the dotted path of the callable.</li>
+<li><strong>schedule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The <em>cron</em>-formatted string specifying the execution schedule for the task.  If not specified, will be set to ‘* * * * * *’, which will execute the iterations as fast as the <code class="docutils literal"><span class="pre">SISY_HEARTBEAT_FREQUENCY</span></code> setting allows (by default, once per minute).</li>
+<li><strong>userdata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A Python dictionary of JSON-serializable data.  If not specified, the dictionary will be empty.</li>
+<li><strong>run_immediately</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – An optional flag which, if set to True, will cause the first iteration of the task to run immediately, instead of waiting for the <em>cron</em> schedule to indicate execution time.</li>
+<li><strong>delay_until</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – If specified, the task will be delayed until the specified datetime by setting the Task object’s <code class="docutils literal"><span class="pre">start_running</span></code> field.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="sisy.models.Task.run_once">
+<em class="property">classmethod </em><code class="descname">run_once</code><span class="sig-paren">(</span><em>cls</em>, <em>the_callable</em>, <em>userdata=dict</em>, <em>delay_until=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sisy/models.html#Task.run_once"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sisy.models.Task.run_once" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>the_callable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The function to call; can be object or string with dotted path.</li>
+<li><strong>userdata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A Python dictionary of JSON-serializable data.  If not specified, the dictionary will be empty.</li>
+<li><strong>delay_until</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.6)"><em>datetime</em></a>) – If specified, the task will be delayed until the specified datetime by setting the Task object’s <code class="docutils literal"><span class="pre">start_running</span></code> field.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="release_notes.html" class="btn btn-neutral float-right" title="Release notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data_migrations.html" class="btn btn-neutral" title="Data migrations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Peter Hull.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0b1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

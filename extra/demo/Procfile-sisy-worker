@@ -1,0 +1,3 @@
+sisyworker: python manage.py runworker --threads=1 --exclude-channels=http.* --exclude-channels=websocket.*
+
+
