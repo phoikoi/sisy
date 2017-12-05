@@ -1,8 +1,8 @@
 Release notes
 =============
 
-1.0 (2017-12-04)
-----------------
+1.0b1 (2017-12-04)
+------------------
 
 First release in public repo, history from private repo scrubbed.
 
@@ -11,5 +11,12 @@ First release in public repo, history from private repo scrubbed.
 *  Needs more tests
 *  Task execution of instance methods only allows for integer primary keys, need to
    find solution for e.g. UUIDs and strings.
+
+1.0b2 (2017-12-05)
+------------------
+
+*  Fixed missing management command (somewhat inconvenient, as this is what runs the main
+   heartbeat command...)
+
 
 
