@@ -1,6 +1,6 @@
 from django.conf import settings
 
-__version__ = "1.0b2"
+__version__ = "1.0b3"
 
 try:
     DEFAULT_SCHEDULE = settings.SISY_DEFAULT_SCHEDULE

@@ -17,7 +17,7 @@ setup(
     name='sisy',
     python_requires='>=3.6',
 
-    version='1.0b2',
+    version='1.0b3',
 
     description='A lightweight repeating task runner app for Django',
     long_description=long_description,
