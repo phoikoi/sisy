@@ -10,7 +10,7 @@ Sisy has the following requirements and compatibilities:
 
 * Python 3.6 or above
 * `Django <https://djangoproject.com/>`_ 1.11 or above, including 2.x
-* `Channels <https://channels.readthedocs.io/en/latest/>`_ 1.1.8 or above (earlier versions may work but no guarantees)
+* `Channels <https://channels.readthedocs.io/en/latest/>`_ 1.1.8  (earlier versions may work but no guarantees, >=2.0 will not work)
 
 Sisy is released under the `MIT License <https://opensource.org/licenses/MIT>`_.
 
