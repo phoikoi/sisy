@@ -17,7 +17,7 @@ setup(
     name='sisy',
     python_requires='>=3.6',
 
-    version='1.0b3',
+    version='1.0b4',
 
     description='A lightweight repeating task runner app for Django',
     long_description=long_description,
@@ -55,7 +55,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'django>=1.11',
-        'channels',
+        'channels<2.0',
         'croniter',
         'arrow',
         'pytz',
